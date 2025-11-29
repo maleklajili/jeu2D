@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
-using Random = UnityEngine.Random; 
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class PlayerMouvment : MonoBehaviour
 {
+    public Text maxHealthText;
+    public int maxHealth = 10;
     public Rigidbody2D rb;                 // Référence au Rigidbody2D du joueur
     public float jumpHeight = 10f;         // Force du saut
     private float movement;                // Valeur du déplacement horizontal
@@ -14,7 +15,10 @@ public class PlayerMouvment : MonoBehaviour
     public Animator animator;              // Référence à l'Animator pour animations
 
     private bool facingRight = true;       // Orientation du joueur (droite/gauche)
-
+    public Transform attackPoint;
+    public float attackRadius = 1.5f;
+    public LayerMask targetLayer;
+   
     // Start est appelé au lancement du jeu
     void Start()
     {
@@ -24,6 +28,10 @@ public class PlayerMouvment : MonoBehaviour
     // Update est appelé une fois par frame
     void Update()
     {
+        if (maxHealth <= 0)
+        {
+            die();
+        }
         movement = Input.GetAxis("Horizontal"); // Lire les touches gauche/droite (-1 à 1)
 
         // Gérer l'orientation du joueur vers la gauche
@@ -92,6 +100,19 @@ public class PlayerMouvment : MonoBehaviour
         rb.velocity = velocity;           // On applique la nouvelle vitesse
     }
 
+
+    public void PlayerAttack()
+    {
+        Collider2D hitInfo = Physics2D.OverlapCircle(attackPoint.position, attackRadius, targetLayer);
+        if (hitInfo)
+        {
+            if (hitInfo.GetComponent<Enemy>() != null) {
+                hitInfo.GetComponent<Enemy>().EnemyTackeDamage(1);
+            }
+
+        }
+    }
+
     // Détection de collision avec le sol
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -100,5 +121,30 @@ public class PlayerMouvment : MonoBehaviour
             isGround = true;                           // Le joueur est au sol
             animator.SetBool("Jump", false);           // Fin animation saut
         }
+    }
+    public void PlayerTackeDamage(int damage)
+    {
+        if (maxHealth <= 0)
+        { return; }
+        {
+
+        }
+        maxHealth -= damage;
+    }
+    private void OnDrawGizmosSelected()
+    {
+
+        if (attackPoint == null)
+        {
+            return;
+           
+        }
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
+    }
+    void die()
+    {
+        Debug.Log(this.transform.name + "died");
+        Destroy(this.gameObject);
     }
 }
