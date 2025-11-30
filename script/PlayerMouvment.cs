@@ -32,6 +32,7 @@ public class PlayerMouvment : MonoBehaviour
         {
             die();
         }
+        maxHealthText.text = maxHealth.ToString();
         movement = Input.GetAxis("Horizontal"); // Lire les touches gauche/droite (-1 à 1)
 
         // Gérer l'orientation du joueur vers la gauche
