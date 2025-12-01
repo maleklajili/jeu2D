@@ -1,33 +1,28 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameOver : MonoBehaviour
 {
+    // Bouton pour revenir au menu principal
     public void Menu()
     {
-        Debug.Log("Menu");
-        // Exemple : charger une scène "Menu"
-        // SceneManager.LoadScene("Menu");
+        Debug.Log("Menu button clicked");
+        SceneManager.LoadScene("Menu"); // Nom exact de la scÃ¨ne Menu
     }
 
+    // Bouton pour recommencer le niveau actuel
     public void Retry()
     {
-        // Recharge la scène actuelle
+        Debug.Log("Retry button clicked");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public void NextLevel()
+    // Bouton pour aller vers LEVEL1
+    public void GoToLevel1()
     {
-        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
-
-        // Vérifie si le prochain niveau existe
-        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
-        {
-            SceneManager.LoadScene(nextSceneIndex);
-        }
-        else
-        {
-            Debug.Log("Aucun niveau suivant dans Build Settings !");
-        }
+        Debug.Log("Go to LEVEL1 button clicked");
+        SceneManager.LoadScene("LEVEL2 1"); // Nom exact de ta scÃ¨ne LEVEL1
+        // Si tu prÃ©fÃ¨res utiliser l'index dans Build Settings :
+        // SceneManager.LoadScene(1);
     }
 }
