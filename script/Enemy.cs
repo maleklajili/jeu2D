@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour
     public float attackRadius = 2f;
     public LayerMask attackLayer;
     public int maxHealth = 3;
+    
     void Start()
     {
 
@@ -70,24 +71,25 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            // Patrouille gauche/droite avec flip
+            // Patrouille gauche/droite
             float dir = facingLeft ? -1f : 1f;
             transform.Translate(Vector2.right * dir * walkSpees * Time.deltaTime);
 
-            // Détection du bord
-            RaycastHit2D hit = Physics2D.Raycast(detectPoint.position, Vector2.down, distance, detectLayer);
-            if (!hit)
+            // Détection du bord (vers le bas)
+            RaycastHit2D groundHit = Physics2D.Raycast(detectPoint.position, Vector2.down, distance, detectLayer);
+            if (!groundHit)
             {
-                if (facingLeft)
-                {
-                    transform.eulerAngles = new Vector3(0f, -180f, 0f);
-                    facingLeft = false;
-                }
-                else
-                {
-                    transform.eulerAngles = new Vector3(0f, 0f, 0f);
-                    facingLeft = true;
-                }
+                Flip();
+                return; // évite de faire aussi la détection de mur dans le même frame
+            }
+
+            // Détection du mur (devant)
+            Vector2 forwardDir = facingLeft ? Vector2.left : Vector2.right;
+            RaycastHit2D wallHit = Physics2D.Raycast(transform.position, forwardDir, 1.5f, detectLayer);
+
+            if (wallHit)
+            {
+                Flip();
             }
         }
     }
@@ -134,5 +136,14 @@ public class Enemy : MonoBehaviour
     {
         Debug.Log(this.gameObject.gameObject + "died");
         Destroy(this.gameObject);
+    }
+    private void Flip()
+    {
+        facingLeft = !facingLeft;
+
+        if (facingLeft)
+            transform.eulerAngles = new Vector3(0f, 0f, 0f);
+        else
+            transform.eulerAngles = new Vector3(0f, -180f, 0f);
     }
 }

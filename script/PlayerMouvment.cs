@@ -1,10 +1,16 @@
 ﻿
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class PlayerMouvment : MonoBehaviour
 {
+    public GameObject victoryUI;
+    public GameObject gameOverUI;
+    public int currentCoin = 0;
+
+    public Text currentCoinText;
     public Text maxHealthText;
     public int maxHealth = 10;
     public Rigidbody2D rb;                 // Référence au Rigidbody2D du joueur
@@ -18,6 +24,7 @@ public class PlayerMouvment : MonoBehaviour
     public Transform attackPoint;
     public float attackRadius = 1.5f;
     public LayerMask targetLayer;
+    private bool isWon = false;
    
     // Start est appelé au lancement du jeu
     void Start()
@@ -27,11 +34,16 @@ public class PlayerMouvment : MonoBehaviour
 
     // Update est appelé une fois par frame
     void Update()
-    {
+    {  if (isWon)
+        {
+            animator.SetFloat("walk", 0);
+            return;
+        }
         if (maxHealth <= 0)
         {
             die();
         }
+        currentCoinText.text = currentCoin.ToString();
         maxHealthText.text = maxHealth.ToString();
         movement = Input.GetAxis("Horizontal"); // Lire les touches gauche/droite (-1 à 1)
 
@@ -123,6 +135,21 @@ public class PlayerMouvment : MonoBehaviour
             animator.SetBool("Jump", false);           // Fin animation saut
         }
     }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Coin")
+        {
+            currentCoin++;
+            other.gameObject.transform.GetChild(0).GetComponent<Animator>().SetTrigger("Collect");
+            Destroy(other.gameObject, 1f);
+        }
+        if (other.gameObject.tag == "Key") {
+           victoryUI.SetActive(true);
+            isWon = true;  
+            Destroy(other.gameObject);
+        }
+    }
+   
     public void PlayerTackeDamage(int damage)
     {
         if (maxHealth <= 0)
@@ -146,6 +173,7 @@ public class PlayerMouvment : MonoBehaviour
     void die()
     {
         Debug.Log(this.transform.name + "died");
+        gameOverUI.SetActive(true);
         Destroy(this.gameObject);
     }
 }
